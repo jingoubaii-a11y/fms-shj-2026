@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财务主体 - 财务中台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003eb3',
+                        secondary: '#e6f0ff',
+                        accent: '#ff6b6b',
+                        neutral: '#f5f7fa',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar {
+            transition: width 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .menu-header h2 {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #003eb3 0%, #0056c7 100%);
+        }
+        
+
+        
+        .drawer {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #003eb3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-neutral">
+
+
+    <!-- 主容器 -->
+    <div class="flex h-screen">
+        <!-- 侧边栏 -->
+        <aside id="sidebar" class="sidebar gradient-bg fixed left-0 top-0 bottom-0 w-64 overflow-y-auto z-10">
+            <div class="p-4 flex items-center justify-between border-b border-white/20">
+                <h1 class="text-xl font-semibold text-white">财务中台</h1>
+                <button id="toggle-sidebar" class="p-2 rounded-md hover:bg-white/10 text-white">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            <nav class="py-4">
+                <!-- 仪表盘 -->
+                <a href="index.html" class="sidebar-item flex items-center px-4 py-3 text-white/90 hover:text-white rounded-md">
+                    <i data-lucide="home" class="sidebar-icon w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">仪表盘</span>
+                </a>
+                
+                <!-- 基础资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="basic-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">基础资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="basic-data-content">
+                        <a href="financial-entity.html" class="sidebar-item flex items-center px-4 py-2 text-white active rounded-md">
+                            <i data-lucide="building" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">财务主体</span>
+                        </a>
+                        <a href="merchant.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="users" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">客商</span>
+                        </a>
+                        <a href="project.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="clipboard-list" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目</span>
+                        </a>
+                        <a href="material.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="package" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">物料</span>
+                        </a>
+                        <a href="cost-ratio.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="pie-chart" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">成本比例配置</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 公共资料 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="public-data">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">公共资料</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="public-data-content">
+                        <a href="currency.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="dollar-sign" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">币别</span>
+                        </a>
+                        <a href="accounting-calendar.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calendar" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">会计日历</span>
+                        </a>
+                        <a href="document-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-text" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">单据类型</span>
+                        </a>
+                        <a href="tax-rate.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="percent" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">税率</span>
+                        </a>
+                        <a href="invoice-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="file-invoice" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">发票类型</span>
+                        </a>
+                        <a href="unit.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="ruler" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">计量单位</span>
+                        </a>
+                        <a href="requirement-type.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="list-checks" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">需求类型</span>
+                        </a>
+                        <a href="source-system.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cloud" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">来源系统</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 项目管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="project-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">项目管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="project-management-content">
+                        <a href="project-overview.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="bar-chart-3" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目概览</span>
+                        </a>
+                        <a href="process-acceptance.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="check-circle" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">工序验收管理</span>
+                        </a>
+                        <a href="accounting-method.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="calculator" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">核算方法管理</span>
+                        </a>
+                        <a href="project-accounting.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="book" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">项目核算</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 应收管理 -->
+                <div class="mt-4">
+                    <div class="menu-header flex items-center justify-between px-4 py-2 cursor-pointer" data-menu="receivable-management">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider">应收管理</h2>
+                        <i data-lucide="chevron-down" class="menu-icon w-4 h-4 text-white/70 transition-transform"></i>
+                    </div>
+                    <div class="menu-content px-2 py-2" id="receivable-management-content">
+                        <a href="receivable.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="credit-card" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">应收单</span>
+                        </a>
+                        <a href="receipt.html" class="sidebar-item flex items-center px-4 py-2 text-white/90 hover:text-white rounded-md">
+                            <i data-lucide="cash" class="sidebar-icon w-4 h-4 mr-3"></i>
+                            <span class="sidebar-text">收款单</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 ml-64 p-6 transition-all duration-300 overflow-y-auto" id="main-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-semibold text-gray-800">财务主体</h1>
+                </div>
+                
+                <!-- 搜索条件和按钮 -->
+                <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex-1 flex items-center space-x-2">
+                        <!-- 筛选条件选择器 -->
+                        <select id="filter-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-sm">
+                            <option value="code">财务主体编码</option>
+                            <option value="name">财务主体名称</option>
+                            <option value="status">状态</option>
+                        </select>
+                        
+                        <!-- 输入框 -->
+                        <input type="text" id="filter-input" placeholder="按财务主体编码搜索" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        
+                        <!-- 搜索按钮 -->
+                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <!-- 刷新按钮 -->
+                        <button class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <!-- 高级筛选按钮 -->
+                        <button id="advanced-filter-btn" class="px-3 py-2 text-primary hover:bg-secondary rounded-md transition-colors flex items-center">
+                            高级筛选
+                            <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 按钮组 -->
+                    <div class="flex space-x-3">
+                        <button id="sync-add-btn" class="px-4 py-2 bg-white border border-primary text-primary rounded-md hover:bg-secondary transition-colors flex items-center">
+                            <i data-lucide="sync" class="w-4 h-4 mr-2"></i>
+                            同步新增财务主体
+                        </button>
+                        <button id="add-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            新增
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 高级筛选条件 -->
+                <div id="advanced-filter" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">财务主体编码</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">财务主体名称</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="">全部</option>
+                            <option value="enabled">启用</option>
+                            <option value="disabled">停用</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 批量操作 -->
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                    <span class="ml-2 text-sm text-gray-700">全选</span>
+                    <button class="ml-4 px-3 py-1 bg-white border border-primary text-primary rounded-md hover:bg-secondary transition-colors text-sm flex items-center">
+                        <i data-lucide="sync" class="w-3 h-3 mr-1"></i>
+                        同步更新财务主体
+                    </button>
+                </div>
+                
+                <!-- 列表 -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                                </th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">财务主体编码</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">财务主体名称</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">关联公司</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">纳税人识别号</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">纳税人类型</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-2">
+                                    <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">FE001</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都总公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">成都分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">91510100MA62N12345</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">一般纳税人</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewEntity('FE001')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editEntity('FE001')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2">
+                                    <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">FE002</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">朗润分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">朗润分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">91510100MA62N67890</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">小规模纳税人</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewEntity('FE002')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editEntity('FE002')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2">
+                                    <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-700">FE003</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">北京分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">北京分公司</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">91110100MA62N54321</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">一般纳税人</td>
+                                <td class="px-4 py-2">
+                                    <label class="switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-2 text-sm">
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700" onclick="viewEntity('FE003')">查看</button>
+                                        <button class="text-primary hover:text-blue-700" onclick="editEntity('FE003')">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="mt-6 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        显示 1-3 条，共 12 条
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            上一页
+                        </button>
+                        <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">4</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑抽屉 -->
+    <div id="edit-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800" id="drawer-title">新增财务主体</h3>
+            <button id="close-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体编码 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="entity-code" maxlength="32" placeholder="字母/数字/下划线">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">财务主体名称 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="entity-name" maxlength="64">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">关联公司 <span class="text-accent">*</span></label>
+                    <div class="relative">
+                        <div id="company-tags" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[40px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <!-- 标签将在这里动态生成 -->
+                        </div>
+                        <div id="company-dropdown" class="hidden absolute z-10 top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            <div class="p-2">
+                                <div class="flex items-center mb-2">
+                                    <input type="text" id="company-search" placeholder="搜索公司" class="w-full px-2 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="cd">
+                                        <input type="checkbox" class="mr-2" id="company-cd">
+                                        <label for="company-cd">成都分公司</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="lr">
+                                        <input type="checkbox" class="mr-2" id="company-lr">
+                                        <label for="company-lr">朗润分公司</label>
+                                    </div>
+                                    <div class="flex items-center p-2 hover:bg-gray-50 cursor-pointer" data-value="bj">
+                                        <input type="checkbox" class="mr-2" id="company-bj">
+                                        <label for="company-bj">北京分公司</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected-companies" name="selected-companies">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">纳税人识别号 <span class="text-accent">*</span></label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="tax-id" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">纳税人类型 <span class="text-accent">*</span></label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="tax-type">
+                        <option value="general">一般纳税人</option>
+                        <option value="small">小规模纳税人</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">财务印章</label>
+                    <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
+                        <i data-lucide="upload" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i>
+                        <p class="text-sm text-gray-500">点击上传或拖拽文件到此处 (jpg/png, ≤10M)</p>
+                        <input type="file" class="hidden" id="seal-upload" accept=".jpg,.jpeg,.png">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态 <span class="text-accent">*</span></label>
+                    <label class="switch">
+                        <input type="checkbox" checked id="entity-status">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="create-by" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">创建时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="create-time" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改人</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="update-by" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">修改时间</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="update-time" disabled>
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="button" id="cancel-btn" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    关闭
+                </button>
+                <button type="button" id="save-btn" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                    保存
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 查看详情抽屉 -->
+    <div id="view-drawer" class="drawer fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg z-20 p-6 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">财务主体详情</h3>
+            <button id="close-view-drawer" class="p-2 rounded-md hover:bg-gray-100">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">财务主体编码</label>
+                <p class="text-sm text-gray-700" id="view-entity-code">FE001</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">财务主体名称</label>
+                <p class="text-sm text-gray-700" id="view-entity-name">成都总公司</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">关联公司</label>
+                <p class="text-sm text-gray-700" id="view-entity-company">成都分公司</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">纳税人识别号</label>
+                <p class="text-sm text-gray-700" id="view-tax-id">91510100MA62N12345</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">纳税人类型</label>
+                <p class="text-sm text-gray-700" id="view-tax-type">一般纳税人</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">财务印章</label>
+                <div class="border border-gray-200 rounded-md p-2">
+                    <img src="https://via.placeholder.com/200x100?text=财务印章" alt="财务印章" class="w-full h-auto rounded">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">状态</label>
+                <p class="text-sm text-gray-700" id="view-entity-status">启用</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">创建人</label>
+                <p class="text-sm text-gray-700" id="view-create-by">admin</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">创建时间</label>
+                <p class="text-sm text-gray-700" id="view-create-time">2026-03-01 10:00:00</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">修改人</label>
+                <p class="text-sm text-gray-700" id="view-update-by">admin</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">修改时间</label>
+                <p class="text-sm text-gray-700" id="view-update-time">2026-03-02 14:30:00</p>
+            </div>
+        </div>
+        <div class="mt-6">
+            <button id="close-view-btn" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 侧边栏折叠/展开功能
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-16');
+            } else {
+                mainContent.classList.remove('ml-16');
+                mainContent.classList.add('ml-64');
+            }
+        });
+        
+        // 菜单展开/收拢功能
+        const menuHeaders = document.querySelectorAll('.menu-header');
+        
+        menuHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const menuName = header.getAttribute('data-menu');
+                const content = document.getElementById(`${menuName}-content`);
+                const icon = header.querySelector('.menu-icon');
+                
+                // 切换内容显示/隐藏
+                content.classList.toggle('hidden');
+                
+                // 切换图标旋转
+                if (content.classList.contains('hidden')) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+        
+        // 高亮当前页面的导航项
+        const currentPath = window.location.pathname;
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        
+        sidebarItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (currentPath.includes(href)) {
+                item.classList.add('active');
+                
+                // 展开包含当前页面的菜单
+                const menuContent = item.closest('.menu-content');
+                if (menuContent) {
+                    menuContent.classList.remove('hidden');
+                    const menuHeader = menuContent.previousElementSibling;
+                    if (menuHeader) {
+                        const icon = menuHeader.querySelector('.menu-icon');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 抽屉遮罩层
+        const drawerOverlay = document.createElement('div');
+        drawerOverlay.className = 'drawer-overlay';
+        drawerOverlay.id = 'drawer-overlay';
+        document.body.appendChild(drawerOverlay);
+        
+        function openDrawer(drawer) {
+            drawer.classList.add('open');
+            drawerOverlay.classList.add('open');
+        }
+        
+        function closeDrawer(drawer) {
+            drawer.classList.remove('open');
+            drawerOverlay.classList.remove('open');
+        }
+        
+        // 点击遮罩层关闭所有抽屉
+        drawerOverlay.addEventListener('click', () => {
+            document.querySelectorAll('.drawer').forEach(drawer => {
+                drawer.classList.remove('open');
+            });
+            drawerOverlay.classList.remove('open');
+        });
+        
+        // 抽屉功能
+        const addBtn = document.getElementById('add-btn');
+        const editDrawer = document.getElementById('edit-drawer');
+        const closeDrawerBtn = document.getElementById('close-drawer');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const drawerTitle = document.getElementById('drawer-title');
+        
+        const viewDrawer = document.getElementById('view-drawer');
+        const closeViewDrawer = document.getElementById('close-view-drawer');
+        const closeViewBtn = document.getElementById('close-view-btn');
+        
+        // 打开新增抽屉
+        addBtn.addEventListener('click', () => {
+            drawerTitle.textContent = '新增财务主体';
+            document.getElementById('entity-code').value = '';
+            document.getElementById('entity-name').value = '';
+            document.getElementById('tax-id').value = '';
+            document.getElementById('tax-type').value = 'general';
+            document.getElementById('entity-status').checked = true;
+            document.getElementById('create-by').value = '';
+            document.getElementById('create-time').value = '';
+            document.getElementById('update-by').value = '';
+            document.getElementById('update-time').value = '';
+            openDrawer(editDrawer);
+        });
+        
+        // 打开编辑抽屉
+        function editEntity(code) {
+            drawerTitle.textContent = '编辑财务主体';
+            // 清空现有标签
+            companyTags.innerHTML = '';
+            // 重置所有复选框
+            document.querySelectorAll('#company-dropdown input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 模拟数据填充
+            if (code === 'FE001') {
+                document.getElementById('entity-code').value = 'FE001';
+                document.getElementById('entity-name').value = '成都总公司';
+                document.getElementById('tax-id').value = '91510100MA62N12345';
+                document.getElementById('tax-type').value = 'general';
+                document.getElementById('entity-status').checked = true;
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 10:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 14:30:00';
+                // 选中成都分公司
+                addCompanyTag('cd', '成都分公司');
+            } else if (code === 'FE002') {
+                document.getElementById('entity-code').value = 'FE002';
+                document.getElementById('entity-name').value = '朗润分公司';
+                document.getElementById('tax-id').value = '91510100MA62N67890';
+                document.getElementById('tax-type').value = 'small';
+                document.getElementById('entity-status').checked = true;
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 11:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 15:00:00';
+                // 选中朗润分公司
+                addCompanyTag('lr', '朗润分公司');
+            } else if (code === 'FE003') {
+                document.getElementById('entity-code').value = 'FE003';
+                document.getElementById('entity-name').value = '北京分公司';
+                document.getElementById('tax-id').value = '91110100MA62N54321';
+                document.getElementById('tax-type').value = 'general';
+                document.getElementById('entity-status').checked = false;
+                document.getElementById('create-by').value = 'admin';
+                document.getElementById('create-time').value = '2026-03-01 12:00:00';
+                document.getElementById('update-by').value = 'admin';
+                document.getElementById('update-time').value = '2026-03-02 16:00:00';
+                // 选中北京分公司
+                addCompanyTag('bj', '北京分公司');
+            }
+            
+            // 更新隐藏输入值
+            updateSelectedCompanies();
+            openDrawer(editDrawer);
+        }
+        
+        // 打开查看抽屉
+        function viewEntity(code) {
+            // 模拟数据填充
+            if (code === 'FE001') {
+                document.getElementById('view-entity-code').textContent = 'FE001';
+                document.getElementById('view-entity-name').textContent = '成都总公司';
+                document.getElementById('view-entity-company').textContent = '成都分公司';
+                document.getElementById('view-tax-id').textContent = '91510100MA62N12345';
+                document.getElementById('view-tax-type').textContent = '一般纳税人';
+                document.getElementById('view-entity-status').textContent = '启用';
+                document.getElementById('view-create-by').textContent = 'admin';
+                document.getElementById('view-create-time').textContent = '2026-03-01 10:00:00';
+                document.getElementById('view-update-by').textContent = 'admin';
+                document.getElementById('view-update-time').textContent = '2026-03-02 14:30:00';
+            } else if (code === 'FE002') {
+                document.getElementById('view-entity-code').textContent = 'FE002';
+                document.getElementById('view-entity-name').textContent = '朗润分公司';
+                document.getElementById('view-entity-company').textContent = '朗润分公司';
+                document.getElementById('view-tax-id').textContent = '91510100MA62N67890';
+                document.getElementById('view-tax-type').textContent = '小规模纳税人';
+                document.getElementById('view-entity-status').textContent = '启用';
+                document.getElementById('view-create-by').textContent = 'admin';
+                document.getElementById('view-create-time').textContent = '2026-03-01 11:00:00';
+                document.getElementById('view-update-by').textContent = 'admin';
+                document.getElementById('view-update-time').textContent = '2026-03-02 15:00:00';
+            } else if (code === 'FE003') {
+                document.getElementById('view-entity-code').textContent = 'FE003';
+                document.getElementById('view-entity-name').textContent = '北京分公司';
+                document.getElementById('view-entity-company').textContent = '北京分公司';
+                document.getElementById('view-tax-id').textContent = '91110100MA62N54321';
+                document.getElementById('view-tax-type').textContent = '一般纳税人';
+                document.getElementById('view-entity-status').textContent = '停用';
+                document.getElementById('view-create-by').textContent = 'admin';
+                document.getElementById('view-create-time').textContent = '2026-03-01 12:00:00';
+                document.getElementById('view-update-by').textContent = 'admin';
+                document.getElementById('view-update-time').textContent = '2026-03-02 16:00:00';
+            }
+            openDrawer(viewDrawer);
+        }
+        
+        // 关闭抽屉
+        closeDrawerBtn.addEventListener('click', () => {
+            closeDrawer(editDrawer);
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            closeDrawer(editDrawer);
+        });
+        
+        closeViewDrawer.addEventListener('click', () => {
+            closeDrawer(viewDrawer);
+        });
+        
+        closeViewBtn.addEventListener('click', () => {
+            closeDrawer(viewDrawer);
+        });
+        
+        // 保存按钮
+        saveBtn.addEventListener('click', () => {
+            // 模拟保存操作
+            alert('保存成功');
+            editDrawer.classList.remove('open');
+        });
+        
+        // 同步新增按钮
+        document.getElementById('sync-add-btn').addEventListener('click', () => {
+            alert('同步新增功能已触发');
+        });
+        
+        // 筛选条件选择器功能
+        const filterSelect = document.getElementById('filter-select');
+        const filterInput = document.getElementById('filter-input');
+        
+        filterSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            
+            // 根据选择的筛选条件更新占位符
+            if (selectedValue === 'code') {
+                filterInput.placeholder = '按财务主体编码搜索';
+            } else if (selectedValue === 'name') {
+                filterInput.placeholder = '按财务主体名称搜索';
+            } else if (selectedValue === 'status') {
+                filterInput.placeholder = '按状态搜索';
+            }
+            
+            // 清空输入框
+            filterInput.value = '';
+        });
+        
+        // 高级筛选功能
+        const advancedFilterBtn = document.getElementById('advanced-filter-btn');
+        const advancedFilter = document.getElementById('advanced-filter');
+        
+        advancedFilterBtn.addEventListener('click', function() {
+            advancedFilter.classList.toggle('hidden');
+            
+            // 切换按钮文本和图标
+            if (!advancedFilter.classList.contains('hidden')) {
+                this.innerHTML = '收起筛选 <i data-lucide="chevron-up" class="w-4 h-4 ml-1"></i>';
+            } else {
+                this.innerHTML = '高级筛选 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>';
+            }
+            
+            // 重新初始化图标
+            lucide.createIcons();
+        });
+        
+        // 关联公司标签选择功能
+        const companyTags = document.getElementById('company-tags');
+        const companyDropdown = document.getElementById('company-dropdown');
+        const companySearch = document.getElementById('company-search');
+        const selectedCompaniesInput = document.getElementById('selected-companies');
+        const companyItems = document.querySelectorAll('#company-dropdown [data-value]');
+        
+        // 打开/关闭下拉框
+        companyTags.addEventListener('click', () => {
+            companyDropdown.classList.toggle('hidden');
+        });
+        
+        // 点击其他地方关闭下拉框
+        document.addEventListener('click', (e) => {
+            if (!companyTags.contains(e.target) && !companyDropdown.contains(e.target)) {
+                companyDropdown.classList.add('hidden');
+            }
+        });
+        
+        // 搜索功能
+        companySearch.addEventListener('input', () => {
+            const searchTerm = companySearch.value.toLowerCase();
+            companyItems.forEach(item => {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                if (label.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // 处理公司选择
+        companyItems.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const label = item.querySelector('label').textContent;
+            const value = item.getAttribute('data-value');
+            
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    // 创建标签
+                    const tag = document.createElement('div');
+                    tag.className = 'flex items-center bg-primary text-white px-2 py-1 rounded-md text-sm';
+                    tag.setAttribute('data-value', value);
+                    tag.innerHTML = `
+                        <span>${label}</span>
+                        <button type="button" class="ml-2 text-white hover:text-gray-200">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    `;
+                    companyTags.appendChild(tag);
+                    
+                    // 添加标签删除功能
+                    const closeBtn = tag.querySelector('button');
+                    closeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        tag.remove();
+                        checkbox.checked = false;
+                        updateSelectedCompanies();
+                    });
+                } else {
+                    // 移除标签
+                    const existingTag = companyTags.querySelector(`[data-value="${value}"]`);
+                    if (existingTag) {
+                        existingTag.remove();
+                    }
+                }
+                
+                // 更新隐藏输入值
+                updateSelectedCompanies();
+            });
+        });
+        
+        // 更新选中的公司到隐藏输入
+        function updateSelectedCompanies() {
+            const selectedTags = companyTags.querySelectorAll('[data-value]');
+            const selectedValues = Array.from(selectedTags).map(tag => tag.getAttribute('data-value'));
+            selectedCompaniesInput.value = selectedValues.join(',');
+        }
+        
+        // 添加公司标签
+        function addCompanyTag(value, label) {
+            // 创建标签
+            const tag = document.createElement('div');
+            tag.className = 'flex items-center bg-primary text-white px-2 py-1 rounded-md text-sm';
+            tag.setAttribute('data-value', value);
+            tag.innerHTML = `
+                <span>${label}</span>
+                <button type="button" class="ml-2 text-white hover:text-gray-200">
+                    <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+            `;
+            companyTags.appendChild(tag);
+            
+            // 选中对应的复选框
+            const checkbox = document.getElementById(`company-${value}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+            
+            // 添加标签删除功能
+            const closeBtn = tag.querySelector('button');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tag.remove();
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                updateSelectedCompanies();
+            });
+        }
+    </script>
+</body>
+</html>
